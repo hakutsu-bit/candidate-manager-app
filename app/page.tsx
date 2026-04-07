@@ -2,6 +2,9 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import type { Candidate } from "@/app/types/candidate";
 
+// リクエストのたびにサーバーで実行する（Vercel本番でのキャッシュを無効化）
+export const dynamic = "force-dynamic";
+
 type Yomi = "A" | "B" | "C";
 
 const yomiBadge: Record<Yomi, string> = {
