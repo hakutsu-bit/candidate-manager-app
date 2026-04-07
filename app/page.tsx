@@ -22,16 +22,41 @@ const statusBadge: Record<string, string> = {
 };
 
 export default async function Home() {
-  const { data, error } = await supabase
-    .from("candidates")
-    .select("*")
-    .order("created_at", { ascending: false });
+  let data = null;
+  let fetchErrorMessage = "";
 
-  if (error) {
+  try {
+    const result = await supabase
+      .from("candidates")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (result.error) {
+      console.error("[candidates] Supabase取得エラー:", {
+        message: result.error.message,
+        code: result.error.code,
+        details: result.error.details,
+        hint: result.error.hint,
+        error: result.error,
+      });
+      fetchErrorMessage = result.error.message;
+    } else {
+      data = result.data;
+    }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("[candidates] 予期しないエラー（fetch失敗など）:", {
+      message,
+      error: e,
+    });
+    fetchErrorMessage = message;
+  }
+
+  if (fetchErrorMessage) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <p className="text-red-500 text-sm">
-          データの取得に失敗しました：{error.message}
+          データの取得に失敗しました：{fetchErrorMessage}
         </p>
       </div>
     );
